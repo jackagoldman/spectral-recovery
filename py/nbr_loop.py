@@ -3,6 +3,7 @@ import geemap
 import numpy as np
 import geopandas as gpd
 import pandas as pd
+import os
 
 ee.Initialize()
 # 
@@ -55,15 +56,20 @@ PostFireStartDayYOFdefault   = 258;  # Sept 15
 PostFireStartDayYAFdefault   = 120;  # April 30
 
 # loop through list of fire ids
+
+
 for j in fids:
   Name = j
   fiya = fires.filterMetadata('Fire_ID', 'equals', Name).first();
   ft = ee.Feature(fiya)
   fName = ft.get("Fire_ID")
   fire = ft
+  
+
   fireBounds = ft.geometry().bounds()
   year = ft.get('Fire_Year')
-  year = ee.String(year)
+  year = year.getInfo()
+  year = str(year)
   fireYear = ee.Date(year)
   preFireYear = fireYear.advance(-1, 'year')
   preFireIndices = lsCol.filterBounds(fireBounds) \
@@ -114,7 +120,7 @@ for j in fids:
   postFireYear9b = postFireYear9.advance(242, 'day')
   postFireYear10 = fireYear.advance(10, 'year')
   postFireYear10a = postFireYear10.advance(141, 'day')
-  postFireYear10b = postFireYear10.advance(2242, 'day')
+  postFireYear10b = postFireYear10.advance(242, 'day')
   
   
   #fire years go from 1986-2020. Is there a way to loop through the code and say if there is only 3 years, leave the rest blank
@@ -171,31 +177,20 @@ for j in fids:
                             .mean() \
                             .rename('nbr10')
   #add bands
-  nbrRecov = postFireIndices1.addBands(postFireIndices2) \
-                            .addBands(postFireIndices3) \
-                            .addBands(postFireIndices4) \
-                            .addBands(postFireIndices5) \
-                            .addBands(postFireIndices6) \
-                            .addBands(postFireIndices7) \
-                            .addBands(postFireIndices8) \
-                            .addBands(postFireIndices9) \
-                            .addBands(postFireIndices10) \
-                            .addBands(preFireIndices)
-  
-  print(Name)
-  
-  task = ee.batch.Export.image.toDrive(**{
-      'image': nbrRecov,
-      'description': names,
-      'folder':'nbr_chapter3_recovery',
-      'scale': 30,
-      'region': fireBounds.getInfo()['coordinates']
-      })
-    # start task
-  task.start()
+  nbrRecov = postFireIndices1.addBands(postFireIndices2)
+  nbrRecov1 = nbrRecov.addBands(postFireIndices3)
+  nbrRecov2 = nbrRecov1.addBands(postFireIndices4)
+  nbrRecov3 = nbrRecov2.addBands(postFireIndices5)
+  nbrRecov4 = nbrRecov3.addBands(postFireIndices6)
+  nbrRecov5 = nbrRecov4.addBands(postFireIndices7)
+  nbrRecov6 = nbrRecov5.addBands(postFireIndices8)
+  nbrRecov7 = nbrRecov6.addBands(postFireIndices9)
+  nbrRecov8 = nbrRecov7.addBands(postFireIndices10)
+  nbrRecov9 = nbrRecov8.addBands(preFireIndices)
+ 
+  nbrRecov9 = water_mask(nbrRecov9)
+
+  geemap.ee_export_image_to_drive(nbrRecov9, description=Name, folder="chapter_3_recovery_waterMask", region=fireBounds, scale=30)
 
 
 
-for j in fids:
-  names = j
-  print(names)
