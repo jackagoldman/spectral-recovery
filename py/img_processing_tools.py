@@ -76,3 +76,22 @@ def water_mask(img):
   maskedImg = img.updateMask(mask)
   return(maskedImg)
 
+def getYearStr(year):
+  return(ee.String('yr_').cat(ee.Algorithms.String(year).slice(0,4)))
+
+
+def getYearNumber(y):
+  y = y.format('YYYY')
+  y = y.getInfo()
+  y = ee.Number.parse(y)
+  return(y)
+
+
+def getYear(ls, number):
+  y = yoiStr[number]
+  return(y)
+
+# for each img calculate nbr
+def nbrPerYear(img):
+  nbr = img.normalizedDifference(['nir', 'swir']).rename('nbr').toFloat()
+  return nbr.copyProperties(img,['system:time_start'])
