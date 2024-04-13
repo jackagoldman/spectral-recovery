@@ -95,3 +95,35 @@ def getYear(ls, number):
 def nbrPerYear(img):
   nbr = img.normalizedDifference(['nir', 'swir']).rename('nbr').toFloat()
   return nbr.copyProperties(img,['system:time_start'])
+
+
+# def function, for each year, create new img for that year wth two bands
+def mergeByYear(img1, img2, key):
+  yr = getYear(yoiStr, key)
+  nir2 = img1.select(yr).rename('nir')
+  swir2 = img2.select(yr).rename('swir')
+  merged = nir2.addBands(swir2)
+  nbr= nbrPerYear(merged)
+  if (key == 0):
+    img = merged.addBands(nbr).select('nbr').rename('preNBR')
+  elif (key == 2):
+    img = merged.addBands(nbr).select('nbr').rename('postNBR')
+  elif (key == 3):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_2yr')
+  elif (key == 4):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_3yr')
+  elif (key == 5):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_4yr')
+  elif (key == 6):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_5yr')
+  elif (key == 7):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_6yr')
+  elif (key == 8):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_7yr')
+  elif (key == 9):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_8yr')
+  elif (key == 10):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_9yr')
+  elif (key == 11):
+    img = merged.addBands(nbr).select('nbr').rename('nbr_10yr')
+  return(img)
