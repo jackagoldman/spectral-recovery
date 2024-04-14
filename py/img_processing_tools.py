@@ -40,6 +40,13 @@ def check_pixel_count(img, geom):
   'scale': 30})
   print(res.getInfo())
 
+# check value
+def check_pixel_mean(img, geom):
+  res = img.reduceRegion(**{
+  'reducer': ee.Reducer.mean(),\
+  'geometry':geom,\
+  'scale': 30})
+  print(res.getInfo())
 
 # check to see if there are pixels: this returns a number object
 def return_pixel_count(img, geom, time):
@@ -127,3 +134,23 @@ def mergeByYear(img1, img2, key):
   elif (key == 11):
     img = merged.addBands(nbr).select('nbr').rename('nbr_10yr')
   return(img)
+
+
+def calcBS(img, ft1):
+  ft1 = ee.Feature(ft1)
+  dnbr = img.expression( "(b('preNBR') - b('postNBR')) * 1000").rename('dnbr').toFloat()
+  ring  = ft1.buffer(180).difference(ft1);
+  offset = ee.Image.constant(ee.Number(dnbr.select('dnbr').reduceRegion(**{'reducer': ee.Reducer.mean(),'geometry': ring.geometry(),'scale': 30,'maxPixels': 1e9}).get('dnbr')))
+  offset = offset.rename('offset').toFloat()
+  dnbr = dnbr.addBands(offset)
+  dnbr = dnbr.addBands(img)
+  dnbr_offset = dnbr.expression("b('dnbr') - b('offset')") \
+          .rename('dnbr_w_offset').toFloat()
+  dnbr_offset = dnbr_offset.addBands(img).addBands(dnbr.select('dnbr'))
+  rbr = dnbr_offset.expression("b('dnbr') / (b('preNBR') + 1.001)").rename('rbr').toFloat().addBands(dnbr_offset) 
+  rbr_offset = rbr.expression("b('dnbr_w_offset') / (b('preNBR') + 1.001)").rename('rbr_w_offset').toFloat().addBands(rbr)
+  rbr_offset = rbr_offset.set('fireID' , ft1.get('Fire_ID'),'fireName' , ft1.get('Fire_Name'), 'fireYear' ,  ft1.get('Fire_Year')) 
+  return(rbr_offset)
+
+
+# for each image in image collection map through the collection, if the year of the image is > 
