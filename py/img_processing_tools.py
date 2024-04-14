@@ -140,7 +140,7 @@ def calcBS(img, ft1):
   ft1 = ee.Feature(ft1)
   dnbr = img.expression( "(b('preNBR') - b('postNBR')) * 1000").rename('dnbr').toFloat()
   ring  = ft1.buffer(180).difference(ft1);
-  offset = ee.Image.constant(ee.Number(dnbr.select('dnbr').reduceRegion(**{'reducer': ee.Reducer.mean(),'geometry': ring.geometry(),'scale': 30,'maxPixels': 1e9}).get('dnbr')))
+  offset = ee.Image.constant(ee.Number(dnbr.select('dnbr').reduceRegion(**{'reducer': ee.Reducer.mean(),'geometry': ring.geometry(),'scale': 30,'maxPixels': 1e13}).get('dnbr')))
   offset = offset.rename('offset').toFloat()
   dnbr = dnbr.addBands(offset)
   dnbr = dnbr.addBands(img)
