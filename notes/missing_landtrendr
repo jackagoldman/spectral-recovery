@@ -2,14 +2,23 @@ errors
 
 too large:
 RED7_1986_119_bi 
-
+SLK60_1996_884_bi 
+QC_1218_1995_bi 
 
 no 2022:
 CHA8_2012_1924_bi  
 CHA8_2012_1924_nbr
 SLK1_2012_1847_bi  
 SLK1_2012_1847_nbr  
+QC_642_2012_nbr 
+QC_642_2012_bi
 
 
 Execution out of memory:
 RED208_1988_862_bi 
+NIP136_1995_1299_bi  
+COC23_1995_1273_bi 
+THU37_2007_1662_bi  
+SLK11_2007_1658_bi 
+NIP20_2005_1521_bi 
+ NIP44_2000_29_bi 
