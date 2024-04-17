@@ -1,9 +1,11 @@
 # raster processing
 
-crop_rasters <- function(dir, shapefile, out_dir, file_extension){
+crop_rasters <- function(dir, shapefile, out_dir, sub, file_extension){
   
   #get a list of all files with ndvi in the name in your directory
   files<-list.files(path=dir, pattern='*.tif', full.names = TRUE)
+  
+  
   
   if (file_extension == "defol"){
     # get file name and filter it from shapefile
@@ -12,6 +14,10 @@ crop_rasters <- function(dir, shapefile, out_dir, file_extension){
       raster <- terra::rast(file)
       name <- basename(name)
       name <- gsub(".tif", "", name)
+      
+      if (exists("sub")){
+        name <- gsub(sub, "", name)
+      }
       
       # get shp that matches name
       shp <- shapefile |> dplyr::filter(Fire_ID == name)
@@ -30,7 +36,9 @@ crop_rasters <- function(dir, shapefile, out_dir, file_extension){
         raster <- terra::rast(file)
         name <- basename(name)
         name <- gsub(".tif", "", name)
-        
+        if (exists("sub")){
+          name <- gsub(sub, "", name)
+        }
         # get shp that matches name
         shp <- shapefile |> dplyr::filter(Fire_ID == name)
         
@@ -46,6 +54,29 @@ crop_rasters <- function(dir, shapefile, out_dir, file_extension){
       }}
       
 }
+
+
+
+compare_files_in_folder <- function(dir,ts, sub){
+  
+  #get a list of all files with ndvi in the name in your directory
+  files<-list.files(path=dir, pattern='*.tif', full.names = TRUE)
+  for (file in files){
+    name <- file
+    name <- basename(name)
+    name <- gsub(".tif", "", name)
+    
+    if (exists("sub")){
+      name <- gsub(sub, "", name)
+    }
+    
+  as.character(ifelse(sum(stringr::str_detect(ts$Fire_ID, name)) >0, TRUE ,print(name)))
+
+  }
+  }
+
+
+
 
 
 get_values <- function(dir, file_extension){
