@@ -90,6 +90,13 @@ def calc_rbr(ras):
     })
     return (df, new_raster)
 
+def std_nbr(df):
+    df.index.name ="year"
+    df.reset_index(inplace=True)
+    df['year'] = df['year'].astype('int16')
+    df['nbr'] = df['nbr'].where(df['nbr'] < 2, df['nbr']/1000)
+    df.set_index('year')
+    return(df)
 
 
 def nc_to_xarray(img, sets):
