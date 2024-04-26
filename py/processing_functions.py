@@ -15,6 +15,15 @@ import pandas as pd
 from exactextract import exact_extract
 
 
+
+
+def int_to_nbr(df):
+    ints = np.arange(0,12,1)
+    df['nbr_time'] = ints
+    df = df['nbr_time'].replace({'0': 'preNBR', '1': 'nbrYOF', '2': '1', '3': '2', '4': '3', '5': '4', '6': '5', '7': '6', '8': '7', '9':'8', '10': '9', '11': '10'})
+    return(df)
+
+
 def fire_year_from_base(filename):
     """takes filepath and returns year of fire"""
     name = re.sub(r'^.*/', "", filename)  
