@@ -40,6 +40,11 @@ def random_sample(da,
         df2 = df2.dropna()
         df2 = std_nbr(df2)
         df2 = df2.loc[(df2['y'] == y) & (df2['x'] == x)]
+        
+        # add id row to df2
+        # add add row that goes preNBR - nbr 10
+        
+        
         pix_samples.append(df2)
 
     #join back into single datafame
@@ -50,4 +55,5 @@ def random_sample(da,
     #remove crs
     all_samples = all_samples.drop(columns =['crs'])
     
+    return(all_samples)
     return(all_samples)
