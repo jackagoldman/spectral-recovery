@@ -104,8 +104,45 @@ def std_nbr(df):
     df.reset_index(inplace=True)
     df['year'] = df['year'].astype('int16')
     df['nbr'] = df['nbr'].where(df['nbr'] <= 1, df['nbr']/1000)
+    df['nbr'] = df['nbr'].where(df['nbr'] >= -1, df['nbr']/1000)
     df.set_index('year')
     return(df)
+
+
+def magnitude_calc(x):
+    pre= x[x['nbr_time'] == 0]
+    pre = pre['nbr'].item()
+    post= x[x['nbr_time'] == 1]
+    post = post['nbr'].item()
+    p_diff = pre - post
+    rec = x[x['nbr_time'] == 11]
+    rec = rec['nbr'].item()
+    rec_diff = rec - post
+    mag = (rec - post)* 100
+    
+    return pd.DataFrame({'recovery_magnitude': [mag]})
+
+def recovery_magnitude(df):
+    grp = df.groupby('id')
+    magnitudes = []
+    # for length in 1-1001
+    ids = np.arange(1,1001,1)
+    for i in ids:
+        # get group
+        x = grp.get_group(i)
+        # calc mac
+        res = magnitude_calc(x)
+        # add id column
+        res['id'] = i
+        # append to list
+        magnitudes.append(res)
+        
+        
+    #join back into single datafame
+    all_mags = pd.concat([magnitudes[i] for i in range(0,len(magnitudes))])
+    
+    return(all_mags)
+
 
 
 def nc_to_xarray(img, sets):
