@@ -9,6 +9,7 @@ import dask
 ## get functions ##
 = inspect.getsource(processing_functions.py)
 = inspect.getsource(../pixel_to_df.py)
+= inspect.getsource(recovery_functions.py)
 
 
 
@@ -72,10 +73,20 @@ for path in d_pathlist:
     pix_count_nd = nd_df.count()
     
     # check to see which has more pixels
-    if pix_count_d > pix_count_nd:
-        pix_count = pix_count_d
+    if pix_count_d < pix_count_nd:
+            pix_count = pix_count_d
         # calc recovery magnitude for all pixels
+            d_df = magnitude_calc_prep(d_df)
+            rec_df = recovery_magnitude(d_df)
+    elif pix_count_d > pix_count_nd:
+            pix_count = pix_count_nd
+            nd_df = magnitude_calc_prep(nd_df)
+            rec_df = recovery_magnitude(nd_df)
+            
+    
+    # return pix_count
         
+            
         
         
 
