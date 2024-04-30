@@ -49,9 +49,16 @@ non_defol_path =
 d_pathlist = Path(defol_path).rglob('*.nc')
 nd_pathlist = Path(non_defol_path).rglob('*.nc')
 
+## output paths
+# reference csv's
+reference_path= 
+boostrap_path=
+# set empty lists
+pix_counts= []
 
 
-### PART I: FIND PORTION OF FIRE WITH LEAST AMOUNT OF PIXELS ###
+      ### PART I: FIND PORTION OF FIRE WITH LEAST AMOUNT OF PIXELS ###
+    
 for path in d_pathlist:
     # get first img
     path_in_str = str(path)
@@ -78,38 +85,52 @@ for path in d_pathlist:
         # calc recovery magnitude for all pixels
             d_df = magnitude_calc_prep(d_df)
             rec_df = recovery_magnitude(d_df)
+            ds = d_df # dataset for boostrap
     elif pix_count_d > pix_count_nd:
             pix_count = pix_count_nd
             nd_df = magnitude_calc_prep(nd_df)
             rec_df = recovery_magnitude(nd_df)
+            ds = nd_df
+
             
-    
     # return pix_count
-        
-            
-        
-        
-
+    # add fire_name to a column
+    pix_count_5 = pix_count / 5
+    pix_count['fire_name'] = name
+    pix_counts.append(pix_count)
     
-
-
-
-
-
-
-####### PART II: BOOTSRAP SAMPLING #######
-
-
-####### loop through directory and read in data, preform ops ######
-
-for path in d_pathlist:
-    path_in_str = str(path) # get path name as string
-    ds = rx.open_rasterio(path, masked=True) # get img
-    name = getName(path_in_str)# get name
+    # add fire name to rec_df
+    rec_df['fire_name'] = name
     
-    #### loop to sample 5 times ####
+    # write out dataframe independently?
+    # file out path
+    out_path = reference_path + name + "rec_mag" + ".csv"
+    rec_df.to_csv(out_path)
+
+    ### PART II: BOOTSRAP SAMPLING ###
+
+    # loop to sample 5 times 
+    rmags = []
     for i in range(1,5):
         #$ get random sample $#
-        df = random_sample(ds, 1000, 1, False) # number of samples = to return from part I step 3b
+        df = random_sample(ds, pix_count_5 , 1, False) # number of samples = to return from part I step 3b
 
         #$ get recovery magnitude $#
+        rm_df = recovery_magnitude(df)
+        rmags.append(rm_df)
+    
+    # join rms
+    all_rms = pd.concat([rmags[i] for i in range(0,len(rmags))])
+    # save rmags as csv
+    all_rms['fire_nane'] = name
+    rms_out_path=boostrap_path + 'rec_mag' + '.csv' 
+    all_rms.to_csv(rms_out_path)
+        
+     
+    
+
+    
+
+# join pixel counts df
+all_pixels = pd.concat([pix_counts[i] for i in range(0,len(pix_counts))])
+
