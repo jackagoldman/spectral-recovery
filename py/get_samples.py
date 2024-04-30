@@ -42,12 +42,12 @@ Part II.
 # DEFAULTS
 
 ## file path ##
-defol_path = 
-non_defol_path = 
+defol_path= 
+non_defol_path= 
 
-## set file path ##
-d_pathlist = Path(defol_path).rglob('*.nc')
-nd_pathlist = Path(non_defol_path).rglob('*.nc')
+## set file path for netCDF files ##
+d_pathlist= Path(defol_path).rglob('*.nc')
+nd_pathlist= Path(non_defol_path).rglob('*.nc')
 
 ## output paths
 # reference csv's
@@ -95,34 +95,34 @@ for path in d_pathlist:
             
     # return pix_count
     # add fire_name to a column
-    pix_count_5 = pix_count / 5
-    pix_count['fire_name'] = name
+    pix_count_5= pix_count / 5
+    pix_count['fire_name']= name
     pix_counts.append(pix_count)
     
     # add fire name to rec_df
-    rec_df['fire_name'] = name
+    rec_df['fire_name']= name
     
     # write out dataframe independently?
     # file out path
-    out_path = reference_path + name + "rec_mag" + ".csv"
+    out_path= reference_path + name + "rec_mag" + ".csv"
     rec_df.to_csv(out_path)
 
     ### PART II: BOOTSRAP SAMPLING ###
 
     # loop to sample 5 times 
-    rmags = []
+    rmags= []
     for i in range(1,5):
         #$ get random sample $#
-        df = random_sample(ds, pix_count_5 , 1, False) # number of samples = to return from part I step 3b
+        df= random_sample(ds, pix_count_5 , 1, False) # number of samples = to return from part I step 3b
 
         #$ get recovery magnitude $#
-        rm_df = recovery_magnitude(df)
+        rm_df= recovery_magnitude(df)
         rmags.append(rm_df)
     
     # join rms
-    all_rms = pd.concat([rmags[i] for i in range(0,len(rmags))])
+    all_rms= pd.concat([rmags[i] for i in range(0,len(rmags))])
     # save rmags as csv
-    all_rms['fire_nane'] = name
+    all_rms['fire_name']= name
     rms_out_path=boostrap_path + 'rec_mag' + '.csv' 
     all_rms.to_csv(rms_out_path)
         
